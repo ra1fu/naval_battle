@@ -52,7 +52,7 @@ public class PlayerRepository implements IPlayerRepository {
 
     @Override
     public Player getPlayer(int id) {
-        String sql = "SELECT player_id, name, rating, games_played, wins, losses FROM players WHERE player_id = ?";
+        String sql = "SELECT id, name, rating, games_played, wins, losses FROM players WHERE id = ?";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -62,7 +62,7 @@ public class PlayerRepository implements IPlayerRepository {
 
             if (rs.next()) {
                 return new Player(
-                        rs.getInt("player_id"),
+                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getInt("rating"),
                         rs.getInt("games_played"),
@@ -79,7 +79,7 @@ public class PlayerRepository implements IPlayerRepository {
 
     @Override
     public List<Player> getAllPlayers() {
-        String sql = "SELECT player_id, name, rating, games_played, wins, losses FROM players";
+        String sql = "SELECT id, name, rating, games_played, wins, losses FROM players";
         List<Player> players = new ArrayList<>();
 
         try (Connection con = db.getConnection();
@@ -88,7 +88,7 @@ public class PlayerRepository implements IPlayerRepository {
 
             while (rs.next()) {
                 Player player = new Player(
-                        rs.getInt("player_id"),
+                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getInt("rating"),
                         rs.getInt("games_played"),
@@ -106,7 +106,7 @@ public class PlayerRepository implements IPlayerRepository {
 
     @Override
     public boolean updatePlayer(Player player) {
-        String sql = "UPDATE players SET name = ?, rating = ?, games_played = ?, wins = ?, losses = ? WHERE player_id = ?";
+        String sql = "UPDATE players SET name = ?, rating = ?, games_played = ?, wins = ?, losses = ? WHERE id = ?";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -129,7 +129,7 @@ public class PlayerRepository implements IPlayerRepository {
 
     @Override
     public boolean deletePlayer(int id) {
-        String sql = "DELETE FROM players WHERE player_id = ?";
+        String sql = "DELETE FROM players WHERE id = ?";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
