@@ -9,20 +9,20 @@ public class Player {
     private int losses;
 
     public Player(String name) {
-        this.name = name;
-        this.rating = 1000;
-        this.gamesPlayed = 0;
-        this.wins = 0;
-        this.losses = 0;
+        setName(name);
+        setRating(1000);
+        setGamesPlayed(0);
+        setWins(0);
+        setLosses(0);
     }
 
     public Player(int playerId, String name, int rating, int gamesPlayed, int wins, int losses) {
-        this.playerId = playerId;
-        this.name = name;
-        this.rating = rating;
-        this.gamesPlayed = gamesPlayed;
-        this.wins = wins;
-        this.losses = losses;
+        setPlayerId(playerId);
+        setName(name);
+        setRating(rating);
+        setGamesPlayed(gamesPlayed);
+        setWins(wins);
+        setLosses(losses);
     }
 
     public int getPlayerId() { return playerId; }
@@ -37,6 +37,7 @@ public class Player {
     public void setGamesPlayed(int gamesPlayed) { this.gamesPlayed = gamesPlayed; }
     public void setWins(int wins) { this.wins = wins; }
     public void setLosses(int losses) { this.losses = losses; }
+    public void setPlayerId(int playerId) { this.playerId = playerId; }
 
     public void incrementGamesPlayed() { this.gamesPlayed++; }
     public void incrementWins() { this.wins++; }

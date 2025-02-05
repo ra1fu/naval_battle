@@ -93,4 +93,28 @@ public class Board {
             System.out.println();
         }
     }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public char[][] getGrid() {
+        return grid;
+    }
+
+    public void setGrid(char[][] grid) {
+        this.grid = grid;
+    }
+
+    public List<Ship> getShips() {
+        return ships;
+    }
+
+    public void setShips(List<Ship> ships) {
+        this.ships = ships;
+    }
 }

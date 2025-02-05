@@ -7,9 +7,9 @@ public class Result {
     private Player winner;
 
     public Result(Player player1, Player player2, Player winner) {
-        this.player1 = player1;
-        this.player2 = player2;
-        this.winner = winner;
+        setPlayer1(player1);
+        setPlayer2(player2);
+        setWinner(winner);
     }
 
     public Player getPlayer1() {
