@@ -1,16 +1,15 @@
+import data.interfaces.IDB;
 import models.*;
 import data.*;
-import repositories.PlayerRepository;
+import repositories.GameRepository;
 
-import java.sql.Connection;
-import java.util.Scanner;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        PostgresDB PostgresDb = new PostgresDB("34.118.52.174", "rauan", "0000", "naval");
+        IDB db = new PostgresDB("34.118.52.174", "rauan", "0000", "naval");
 
-
-        PostgresDb.close();
+        db.close();
 
     }
 }

@@ -27,6 +27,15 @@ public class Game {
         setWinnerId(winnerId);
     }
 
+    public Game(int player1Id, int player2Id, int currentTurn, String status, Integer winnerId) {
+        setPlayer1Id(player1Id);
+        setPlayer2Id(player2Id);
+        setCurrentTurn(currentTurn);
+        setStatus(status);
+        setWinnerId(winnerId);
+
+    }
+
     public int getGameId() {
         return gameId;
     }
