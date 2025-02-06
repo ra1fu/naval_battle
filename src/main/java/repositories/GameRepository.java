@@ -7,10 +7,10 @@ import repositories.interfaces.IGameRepository;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.postgresql.util.PGobject; // Импорт для работы с ENUM
+import org.postgresql.util.PGobject;
 
 public class GameRepository implements IGameRepository {
-    private final IDB db;  // Dependency Injection
+    private final IDB db;
 
     public GameRepository(IDB db) {
         this.db = db;
@@ -27,7 +27,6 @@ public class GameRepository implements IGameRepository {
             st.setInt(2, game.getPlayer2Id());
             st.setInt(3, game.getCurrentTurn());
 
-            // Приведение ENUM к PostgreSQL game_status
             PGobject statusObj = new PGobject();
             statusObj.setType("game_status");
             statusObj.setValue(game.getStatus());

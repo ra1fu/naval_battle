@@ -24,6 +24,26 @@ public class Ship {
         this.hits = 0;
     }
 
+    public int getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
+    }
+
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
+
+    public void setHits(int hits) {
+        this.hits = hits;
+    }
+
     public int getShipId() {
         return shipId;
     }

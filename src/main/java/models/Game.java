@@ -4,20 +4,18 @@ public class Game {
     private int gameId;
     private int player1Id;
     private int player2Id;
-    private int currentTurn; // ID текущего игрока
-    private String status; // Статус игры: "in_progress", "completed"
-    private Integer winnerId; // ID победителя, если игра завершена
+    private int currentTurn;
+    private String status;
+    private Integer winnerId;
 
-    // Конструктор без ID (для создания новых игр)
     public Game(int player1Id, int player2Id) {
         setPlayer1Id(player1Id);
         setPlayer2Id(player2Id);
-        setCurrentTurn(player1Id); // Первым ходит player1
+        setCurrentTurn(player1Id);
         setStatus("in_progress");
         setWinnerId(null);
     }
 
-    // Конструктор с ID (для загрузки из базы данных)
     public Game(int gameId, int player1Id, int player2Id, int currentTurn, String status, Integer winnerId) {
         setGameId(gameId);
         setPlayer1Id(player1Id);
@@ -84,7 +82,6 @@ public class Game {
         this.winnerId = winnerId;
     }
 
-    // Метод для смены хода
     public void switchTurn() {
         if (this.currentTurn == this.player1Id) {
             this.currentTurn = this.player2Id;
