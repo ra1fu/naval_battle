@@ -9,6 +9,4 @@ public interface IShipRepository {
     List<Ship> getShipsByGameAndPlayer(int gameId, int playerId);
     boolean updateShip(Ship ship);
     boolean deleteShip(int shipId);
-
-    }
-
+}
