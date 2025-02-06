@@ -3,6 +3,7 @@ package repositories;
 import data.interfaces.IDB;
 import models.Ship;
 import repositories.interfaces.IShipRepository;
+import factories.EntityFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -32,7 +33,6 @@ public class ShipRepository implements IShipRepository {
             st.setBoolean(8, ship.isSunk());
 
             int affectedRows = st.executeUpdate();
-
             if (affectedRows == 0) {
                 throw new SQLException("Ship creation failed, nothing changed");
             }
@@ -44,7 +44,6 @@ public class ShipRepository implements IShipRepository {
                     throw new SQLException("Ship creation error, the ID cannot be received.");
                 }
             }
-
             return true;
         } catch (SQLException e) {
             System.out.println("SQL Error (createShip): " + e.getMessage());
@@ -63,7 +62,7 @@ public class ShipRepository implements IShipRepository {
             ResultSet rs = st.executeQuery();
 
             if (rs.next()) {
-                return new Ship(
+                return EntityFactory.createShip(
                         rs.getInt("ship_id"),
                         rs.getInt("game_id"),
                         rs.getInt("player_id"),
@@ -78,7 +77,6 @@ public class ShipRepository implements IShipRepository {
         } catch (SQLException e) {
             System.out.println("SQL Error (getShip): " + e.getMessage());
         }
-
         return null;
     }
 
@@ -93,8 +91,9 @@ public class ShipRepository implements IShipRepository {
             st.setInt(1, gameId);
             st.setInt(2, playerId);
             ResultSet rs = st.executeQuery();
+
             while (rs.next()) {
-                Ship ship = new Ship(
+                ships.add(EntityFactory.createShip(
                         rs.getInt("ship_id"),
                         rs.getInt("game_id"),
                         rs.getInt("player_id"),
@@ -104,17 +103,14 @@ public class ShipRepository implements IShipRepository {
                         rs.getInt("start_y"),
                         rs.getString("orientation"),
                         rs.getBoolean("sunk")
-                );
-                ships.add(ship);
+                ));
             }
         } catch (SQLException e) {
             System.out.println("SQL Error (getShipsByGameAndPlayer): " + e.getMessage());
         }
-
         return ships;
     }
 
-  
     @Override
     public boolean updateShip(Ship ship) {
         String sql = "UPDATE ships SET game_id = ?, player_id = ?, type = ?, size = ?, start_x = ?, start_y = ?, orientation = ?, sunk = ? WHERE ship_id = ?";
@@ -132,9 +128,7 @@ public class ShipRepository implements IShipRepository {
             st.setBoolean(8, ship.isSunk());
             st.setInt(9, ship.getShipId());
 
-            int affectedRows = st.executeUpdate();
-
-            return affectedRows > 0;
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (updateShip): " + e.getMessage());
             return false;
@@ -149,9 +143,7 @@ public class ShipRepository implements IShipRepository {
              PreparedStatement st = con.prepareStatement(sql)) {
 
             st.setInt(1, id);
-            int affectedRows = st.executeUpdate();
-
-            return affectedRows > 0;
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (deleteShip): " + e.getMessage());
             return false;

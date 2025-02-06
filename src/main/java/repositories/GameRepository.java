@@ -6,6 +6,7 @@ import models.GameDetails;
 import models.Move;
 import models.Ship;
 import repositories.interfaces.IGameRepository;
+import factories.EntityFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -42,19 +43,17 @@ public class GameRepository implements IGameRepository {
             }
 
             int affectedRows = st.executeUpdate();
-
             if (affectedRows == 0) {
-                throw new SQLException("The creation of the game failed, no rows affected.");
+                throw new SQLException("Game creation failed, no rows affected.");
             }
 
             try (ResultSet generatedKeys = st.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     game.setGameId(generatedKeys.getInt(1));
                 } else {
-                    throw new SQLException("The creation of the game failed, and the ID could not be obtained.");
+                    throw new SQLException("Game creation failed, ID not obtained.");
                 }
             }
-
             return true;
         } catch (SQLException e) {
             System.out.println("SQL Error (createGame): " + e.getMessage());
@@ -68,29 +67,22 @@ public class GameRepository implements IGameRepository {
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
-
             st.setInt(1, id);
             ResultSet rs = st.executeQuery();
 
             if (rs.next()) {
-                Integer winnerId = rs.getInt("winner_id");
-                if (rs.wasNull()) {
-                    winnerId = null;
-                }
-
-                return new Game(
+                return EntityFactory.createGame(
                         rs.getInt("game_id"),
                         rs.getInt("player1_id"),
                         rs.getInt("player2_id"),
                         rs.getInt("current_turn"),
                         rs.getString("status"),
-                        winnerId
+                        rs.getObject("winner_id") != null ? rs.getInt("winner_id") : null
                 );
             }
         } catch (SQLException e) {
             System.out.println("SQL Error (getGame): " + e.getMessage());
         }
-
         return null;
     }
 
@@ -104,25 +96,18 @@ public class GameRepository implements IGameRepository {
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
-                Integer winnerId = rs.getInt("winner_id");
-                if (rs.wasNull()) {
-                    winnerId = null;
-                }
-
-                Game game = new Game(
+                games.add(EntityFactory.createGame(
                         rs.getInt("game_id"),
                         rs.getInt("player1_id"),
                         rs.getInt("player2_id"),
                         rs.getInt("current_turn"),
                         rs.getString("status"),
-                        winnerId
-                );
-                games.add(game);
+                        rs.getObject("winner_id") != null ? rs.getInt("winner_id") : null
+                ));
             }
         } catch (SQLException e) {
             System.out.println("SQL Error (getAllGames): " + e.getMessage());
         }
-
         return games;
     }
 
@@ -137,7 +122,6 @@ public class GameRepository implements IGameRepository {
             st.setInt(2, game.getPlayer2Id());
             st.setInt(3, game.getCurrentTurn());
 
-            // Приведение ENUM-значения
             PGobject statusObj = new PGobject();
             statusObj.setType("game_status");
             statusObj.setValue(game.getStatus());
@@ -150,9 +134,7 @@ public class GameRepository implements IGameRepository {
             }
 
             st.setInt(6, game.getGameId());
-
-            int affectedRows = st.executeUpdate();
-            return affectedRows > 0;
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (updateGame): " + e.getMessage());
             return false;
@@ -165,10 +147,8 @@ public class GameRepository implements IGameRepository {
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
-
             st.setInt(1, id);
-            int affectedRows = st.executeUpdate();
-            return affectedRows > 0;
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (deleteGame): " + e.getMessage());
             return false;
@@ -179,8 +159,8 @@ public class GameRepository implements IGameRepository {
     public GameDetails getFullGameDetails(int gameId) {
         String sql = "SELECT g.game_id, g.status, g.winner_id, " +
                 "p1.name AS player1_name, p2.name AS player2_name, " +
-                "s.ship_id, s.player_id AS ship_player_id, s.x AS ship_x, s.y AS ship_y, s.type AS ship_type, s.sunk, " +
-                "m.move_id, m.player_id AS move_player_id, m.x AS move_x, m.y AS move_y, m.result " +
+                "s.ship_id, s.player_id AS ship_player_id, s.x AS ship_x, s.y AS ship_y, s.type AS ship_type, s.size, s.orientation, s.sunk, " +
+                "m.move_id, m.player_id AS move_player_id, m.x AS move_x, m.y AS move_y, m.result, m.move_time " +
                 "FROM games g " +
                 "JOIN players p1 ON g.player1_id = p1.player_id " +
                 "JOIN players p2 ON g.player2_id = p2.player_id " +
@@ -199,41 +179,38 @@ public class GameRepository implements IGameRepository {
 
             while (rs.next()) {
                 if (gameDetails == null) {
-                    gameDetails = new GameDetails(
+                    gameDetails = EntityFactory.createGameDetails(
                             rs.getInt("game_id"),
                             rs.getString("status"),
-                            rs.getInt("winner_id"),
+                            rs.getObject("winner_id") != null ? rs.getInt("winner_id") : null,
                             rs.getString("player1_name"),
                             rs.getString("player2_name"),
                             ships,
                             moves
                     );
                 }
+                ships.add(EntityFactory.createShip(
+                        rs.getInt("ship_id"),
+                        rs.getInt("game_id"),
+                        rs.getInt("ship_player_id"),
+                        rs.getString("ship_type"),
+                        rs.getInt("size"),
+                        rs.getInt("ship_x"),
+                        rs.getInt("ship_y"),
+                        rs.getString("orientation"),
+                        rs.getBoolean("sunk")
+                ));
 
-                // Check if ship_id is not NULL before adding
-                int shipId = rs.getInt("ship_id");
-                if (!rs.wasNull()) {
-                    ships.add(new Ship(
-                            shipId,
-                            rs.getInt("game_id"),
-                            rs.getInt("ship_player_id"),
-                            rs.getInt("ship_x"),
-                            rs.getInt("ship_y"),
-                            rs.getString("ship_type"),
-                            rs.getBoolean("sunk")
-                    ));
-                }
-
-                // Check if move_id is not NULL before adding
-                int moveId = rs.getInt("move_id");
-                if (!rs.wasNull()) {
-                    moves.add(new Move(
-                            moveId,
+                // Process Moves (Check if move_id is not NULL)
+                if (!rs.wasNull() && rs.getObject("move_id") != null) {
+                    moves.add(EntityFactory.createMove(
+                            rs.getInt("move_id"),
                             rs.getInt("game_id"),
                             rs.getInt("move_player_id"),
                             rs.getInt("move_x"),
                             rs.getInt("move_y"),
-                            rs.getString("result")
+                            rs.getString("result"),
+                            rs.getTimestamp("move_time") != null ? rs.getTimestamp("move_time").toLocalDateTime() : null
                     ));
                 }
             }
@@ -243,6 +220,5 @@ public class GameRepository implements IGameRepository {
             return null;
         }
     }
-
 
 }

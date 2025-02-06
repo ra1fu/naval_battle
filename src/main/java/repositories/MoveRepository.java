@@ -3,6 +3,7 @@ package repositories;
 import data.interfaces.IDB;
 import models.Move;
 import repositories.interfaces.IMoveRepository;
+import factories.EntityFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ public class MoveRepository implements IMoveRepository {
 
     @Override
     public boolean createMove(Move move) {
-
         String checkGameSql = "SELECT COUNT(*) FROM games WHERE game_id = ?";
         try (Connection con = db.getConnection();
              PreparedStatement checkStmt = con.prepareStatement(checkGameSql)) {
@@ -34,6 +34,7 @@ public class MoveRepository implements IMoveRepository {
 
         String sql = "INSERT INTO moves(game_id, player_id, x, y, result, move_time) " +
                 "VALUES (?, ?, ?, ?, ?::move_result, ?)";
+
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             st.setInt(1, move.getGameId());
@@ -62,19 +63,17 @@ public class MoveRepository implements IMoveRepository {
         }
     }
 
-
     @Override
     public Move getMove(int id) {
         String sql = "SELECT move_id, game_id, player_id, x, y, result, move_time FROM moves WHERE move_id = ?";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
-
             st.setInt(1, id);
             ResultSet rs = st.executeQuery();
 
             if (rs.next()) {
-                return new Move(
+                return EntityFactory.createMove(
                         rs.getInt("move_id"),
                         rs.getInt("game_id"),
                         rs.getInt("player_id"),
@@ -102,7 +101,7 @@ public class MoveRepository implements IMoveRepository {
             st.setInt(1, gameId);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Move move = new Move(
+                moves.add(EntityFactory.createMove(
                         rs.getInt("move_id"),
                         rs.getInt("game_id"),
                         rs.getInt("player_id"),
@@ -110,8 +109,7 @@ public class MoveRepository implements IMoveRepository {
                         rs.getInt("y"),
                         rs.getString("result"),
                         rs.getTimestamp("move_time").toLocalDateTime()
-                );
-                moves.add(move);
+                ));
             }
         } catch (SQLException e) {
             System.out.println("SQL Error (getMovesByGameId): " + e.getMessage());
@@ -131,13 +129,11 @@ public class MoveRepository implements IMoveRepository {
             st.setInt(2, move.getPlayerId());
             st.setInt(3, move.getX());
             st.setInt(4, move.getY());
-            st.setString(5, move.getResult()); // Приведение типа в SQL
+            st.setString(5, move.getResult()); // Type casting in SQL
             st.setTimestamp(6, Timestamp.valueOf(move.getMoveTime()));
             st.setInt(7, move.getMoveId());
 
-            int affectedRows = st.executeUpdate();
-
-            return affectedRows > 0;
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (updateMove): " + e.getMessage());
             return false;
@@ -152,9 +148,7 @@ public class MoveRepository implements IMoveRepository {
              PreparedStatement st = con.prepareStatement(sql)) {
 
             st.setInt(1, id);
-            int affectedRows = st.executeUpdate();
-
-            return affectedRows > 0;
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (deleteMove): " + e.getMessage());
             return false;

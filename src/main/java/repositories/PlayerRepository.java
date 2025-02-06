@@ -1,9 +1,9 @@
 package repositories;
 
-
 import data.interfaces.IDB;
 import models.Player;
 import repositories.interfaces.IPlayerRepository;
+import factories.EntityFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -30,9 +30,8 @@ public class PlayerRepository implements IPlayerRepository {
             st.setInt(5, player.getLosses());
 
             int affectedRows = st.executeUpdate();
-
             if (affectedRows == 0) {
-                throw new SQLException("Player creation failed, no strings were touched.");
+                throw new SQLException("Player creation failed, no rows were affected.");
             }
 
             try (ResultSet generatedKeys = st.getGeneratedKeys()) {
@@ -42,7 +41,6 @@ public class PlayerRepository implements IPlayerRepository {
                     throw new SQLException("Player creation failed, ID could not be obtained.");
                 }
             }
-
             return true;
         } catch (SQLException e) {
             System.out.println("SQL Error (createPlayer): " + e.getMessage());
@@ -61,7 +59,7 @@ public class PlayerRepository implements IPlayerRepository {
             ResultSet rs = st.executeQuery();
 
             if (rs.next()) {
-                return new Player(
+                return EntityFactory.createPlayer(
                         rs.getInt("player_id"),
                         rs.getString("name"),
                         rs.getInt("rating"),
@@ -73,7 +71,6 @@ public class PlayerRepository implements IPlayerRepository {
         } catch (SQLException e) {
             System.out.println("SQL Error (getPlayer): " + e.getMessage());
         }
-
         return null;
     }
 
@@ -87,20 +84,18 @@ public class PlayerRepository implements IPlayerRepository {
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
-                Player player = new Player(
+                players.add(EntityFactory.createPlayer(
                         rs.getInt("player_id"),
                         rs.getString("name"),
                         rs.getInt("rating"),
                         rs.getInt("games_played"),
                         rs.getInt("wins"),
                         rs.getInt("losses")
-                );
-                players.add(player);
+                ));
             }
         } catch (SQLException e) {
             System.out.println("SQL Error (getAllPlayers): " + e.getMessage());
         }
-
         return players;
     }
 
@@ -118,9 +113,7 @@ public class PlayerRepository implements IPlayerRepository {
             st.setInt(5, player.getLosses());
             st.setInt(6, player.getPlayerId());
 
-            int affectedRows = st.executeUpdate();
-
-            return affectedRows > 0;
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (updatePlayer): " + e.getMessage());
             return false;
@@ -135,13 +128,10 @@ public class PlayerRepository implements IPlayerRepository {
              PreparedStatement st = con.prepareStatement(sql)) {
 
             st.setInt(1, id);
-            int affectedRows = st.executeUpdate();
-
-            return affectedRows > 0;
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (deletePlayer): " + e.getMessage());
             return false;
         }
     }
 }
-
