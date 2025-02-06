@@ -30,6 +30,9 @@ public class Move {
         this.moveTime = moveTime;
     }
 
+    public Move(int moveId, int gameId, int movePlayerId, int moveX, int moveY, String result) {
+    }
+
     public int getMoveId() {
         return moveId;
     }

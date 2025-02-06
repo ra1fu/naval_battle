@@ -24,6 +24,9 @@ public class Ship {
         this.hits = 0;
     }
 
+    public Ship(int shipId, int gameId, int shipPlayerId, int shipX, int shipY, String shipType, boolean sunk) {
+    }
+
     public int getGameId() {
         return gameId;
     }
