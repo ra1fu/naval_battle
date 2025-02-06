@@ -2,6 +2,8 @@ package models;
 
 public class Ship {
     private int shipId;
+    private int gameId;
+    private int playerId;
     private String type;
     private int size;
     private int startX, startY;
@@ -9,15 +11,37 @@ public class Ship {
     private boolean sunk;
     private int hits;
 
-    public Ship(int shipId, String type, int size, int startX, int startY, String orientation) {
+    public Ship(int shipId, int gameId, int playerId, String type, int size, int startX, int startY, String orientation, boolean sunk) {
         this.shipId = shipId;
+        this.gameId = gameId;
+        this.playerId = playerId;
         this.type = type;
         this.size = size;
         this.startX = startX;
         this.startY = startY;
         this.orientation = orientation;
-        this.sunk = false;
+        this.sunk = sunk;
         this.hits = 0;
+    }
+
+    public int getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
+    }
+
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
+
+    public void setHits(int hits) {
+        this.hits = hits;
     }
 
     public int getShipId() {
