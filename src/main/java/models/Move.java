@@ -12,77 +12,90 @@ public class Move {
     private LocalDateTime moveTime;
 
     public Move(int gameId, int playerId, int x, int y, String result, LocalDateTime moveTime) {
-        setMoveId(gameId);
-        setPlayerId(playerId);
-        setX(x);
-        setY(y);
-        setResult(result);
-        setMoveTime(moveTime);
+        this.gameId = gameId;
+        this.playerId = playerId;
+        this.x = x;
+        this.y = y;
+        this.result = result;
+        this.moveTime = moveTime;
     }
 
     public Move(int moveId, int gameId, int playerId, int x, int y, String result, LocalDateTime moveTime) {
-        setMoveId(moveId);
-        setGameId(gameId);
-        setPlayerId(playerId);
-        setX(x);
-        setY(y);
-        setResult(result);
-        setMoveTime(moveTime);
+        this.moveId = moveId;
+        this.gameId = gameId;
+        this.playerId = playerId;
+        this.x = x;
+        this.y = y;
+        this.result = result;
+        this.moveTime = moveTime;
     }
 
     public int getMoveId() {
         return moveId;
     }
 
+    public void setMoveId(int moveId) {
+        this.moveId = moveId;
+    }
+
     public int getGameId() {
         return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
     }
 
     public int getPlayerId() {
         return playerId;
     }
 
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
+
     public int getX() {
         return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public LocalDateTime getMoveTime() {
-        return moveTime;
-    }
-
-    public void setMoveId(int moveId) {
-        this.moveId = moveId;
-    }
-
-    public void setMoveTime(LocalDateTime moveTime) {
-        this.moveTime = moveTime;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
     }
 
     public void setX(int x) {
         this.x = x;
     }
 
+    public int getY() {
+        return y;
+    }
+
     public void setY(int y) {
         this.y = y;
     }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
+    public String getResult() {
+        return result;
     }
 
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public LocalDateTime getMoveTime() {
+        return moveTime;
+    }
+
+    public void setMoveTime(LocalDateTime moveTime) {
+        this.moveTime = moveTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Move{" +
+                "moveId=" + moveId +
+                ", gameId=" + gameId +
+                ", playerId=" + playerId +
+                ", x=" + x +
+                ", y=" + y +
+                ", result='" + result + '\'' +
+                ", moveTime=" + moveTime +
+                '}';
     }
 }
