@@ -122,7 +122,7 @@ public class Tournament {
 
     private Player simulateMatch(Player player1, Player player2) {
         Random random = new Random();
-        return random.nextBoolean() ? player1 : player2; // Случайный победитель
+        return random.nextBoolean() ? player1 : player2;
     }
 
     public void determineWinner() {

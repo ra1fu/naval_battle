@@ -114,6 +114,7 @@ public class ShipRepository implements IShipRepository {
         return ships;
     }
 
+  
     @Override
     public boolean updateShip(Ship ship) {
         String sql = "UPDATE ships SET game_id = ?, player_id = ?, type = ?, size = ?, start_x = ?, start_y = ?, orientation = ?, sunk = ? WHERE ship_id = ?";

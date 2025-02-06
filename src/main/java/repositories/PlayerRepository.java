@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerRepository implements IPlayerRepository {
-    private final IDB db;  // Dependency Injection
+    private final IDB db;
 
     public PlayerRepository(IDB db) {
         this.db = db;
