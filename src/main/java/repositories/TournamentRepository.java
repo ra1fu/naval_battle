@@ -61,7 +61,6 @@ public class TournamentRepository implements ITournamentRepository {
                 }
             }
 
-            // 3. Добавляем игрока в турнир
             try (PreparedStatement insertSt = con.prepareStatement(insertSql)) {
                 insertSt.setInt(1, tournamentId);
                 insertSt.setInt(2, playerId);
