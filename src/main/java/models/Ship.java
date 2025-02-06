@@ -2,6 +2,8 @@ package models;
 
 public class Ship {
     private int shipId;
+    private int gameId;
+    private int playerId;
     private String type;
     private int size;
     private int startX, startY;
@@ -9,14 +11,16 @@ public class Ship {
     private boolean sunk;
     private int hits;
 
-    public Ship(int shipId, String type, int size, int startX, int startY, String orientation) {
+    public Ship(int shipId, int gameId, int playerId, String type, int size, int startX, int startY, String orientation, boolean sunk) {
         this.shipId = shipId;
+        this.gameId = gameId;
+        this.playerId = playerId;
         this.type = type;
         this.size = size;
         this.startX = startX;
         this.startY = startY;
         this.orientation = orientation;
-        this.sunk = false;
+        this.sunk = sunk;
         this.hits = 0;
     }
 
@@ -26,6 +30,22 @@ public class Ship {
 
     public void setShipId(int shipId) {
         this.shipId = shipId;
+    }
+
+    public int getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
+    }
+
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
     }
 
     public String getType() {
@@ -68,12 +88,20 @@ public class Ship {
         this.orientation = orientation;
     }
 
+    public boolean isSunk() {
+        return sunk;
+    }
+
     public void setSunk(boolean sunk) {
         this.sunk = sunk;
     }
 
     public int getHits() {
         return hits;
+    }
+
+    public void setHits(int hits) {
+        this.hits = hits;
     }
 
     public void hit() {
@@ -85,14 +113,19 @@ public class Ship {
         }
     }
 
-
-    public boolean isSunk() {
-        return sunk;
-    }
-
     @Override
     public String toString() {
-        return "Ship{" + "shipId=" + shipId + ", type='" + type + '\'' + ", size=" + size + ", startX=" + startX +
-                ", startY=" + startY + ", orientation='" + orientation + '\'' + ", sunk=" + sunk + ", hits=" + hits + '}';
+        return "Ship{" +
+                "shipId=" + shipId +
+                ", gameId=" + gameId +
+                ", playerId=" + playerId +
+                ", type='" + type + '\'' +
+                ", size=" + size +
+                ", startX=" + startX +
+                ", startY=" + startY +
+                ", orientation='" + orientation + '\'' +
+                ", sunk=" + sunk +
+                ", hits=" + hits +
+                '}';
     }
 }
