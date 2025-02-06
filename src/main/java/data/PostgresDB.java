@@ -2,21 +2,34 @@ package data;
 
 import data.interfaces.IDB;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class PostgresDB implements IDB {
-    private String host;
-    private String username;
-    private String password;
-    private String dbName;
-
+    private static PostgresDB instance;
+    private final String host;
+    private final String username;
+    private final String password;
+    private final String dbName;
     private Connection connection;
 
-    public PostgresDB(String host, String username, String password, String dbName) {
-        setHost(host);
-        setUsername(username);
-        setPassword(password);
-        setDbName(dbName);
+    private PostgresDB(String host, String username, String password, String dbName) {
+        this.host = host;
+        this.username = username;
+        this.password = password;
+        this.dbName = dbName;
+    }
+
+    public static PostgresDB getInstance(String host, String username, String password, String dbName) {
+        if (instance == null) {
+            synchronized (PostgresDB.class) {
+                if (instance == null) {
+                    instance = new PostgresDB(host, username, password, dbName);
+                }
+            }
+        }
+        return instance;
     }
 
     @Override
@@ -28,53 +41,19 @@ public class PostgresDB implements IDB {
             }
 
             Class.forName("org.postgresql.Driver");
-
             connection = DriverManager.getConnection(connectionUrl, username, password);
-
             return connection;
         } catch (Exception e) {
-            System.out.println("failed to connect to postgres: " + e.getMessage());
-
+            System.out.println("Failed to connect to PostgreSQL: " + e.getMessage());
             return null;
         }
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getDbName() {
-        return dbName;
-    }
-
-    public void setDbName(String dbName) {
-        this.dbName = dbName;
     }
 
     public void close() {
         if (connection != null) {
             try {
                 connection.close();
+                System.out.println("Database connection closed.");
             } catch (SQLException ex) {
                 System.out.println("Connection close error: " + ex.getMessage());
             }

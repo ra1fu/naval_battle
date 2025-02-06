@@ -1,6 +1,7 @@
 package repositories.interfaces;
 
 import models.Game;
+import models.GameDetails;
 import java.util.List;
 
 public interface IGameRepository {
@@ -9,4 +10,5 @@ public interface IGameRepository {
     List<Game> getAllGames();
     boolean updateGame(Game game);
     boolean deleteGame(int id);
+    GameDetails getFullGameDetails(int gameId);;
 }
