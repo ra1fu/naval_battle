@@ -4,6 +4,7 @@ import data.interfaces.IDB;
 import models.Player;
 import repositories.interfaces.IPlayerRepository;
 import factories.EntityFactory;
+import validators.PlayerValidator;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,6 +19,10 @@ public class PlayerRepository implements IPlayerRepository {
 
     @Override
     public boolean createPlayer(Player player) {
+        if (!PlayerValidator.isValid(player)) {
+            throw new IllegalArgumentException("Invalid player data! Please check name, rating, and stats.");
+        }
+
         String sql = "INSERT INTO players(name, rating, games_played, wins, losses) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection con = db.getConnection();
