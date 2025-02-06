@@ -40,32 +40,12 @@ public class Ship {
         this.playerId = playerId;
     }
 
-    public void setHits(int hits) {
-        this.hits = hits;
-    }
-
     public int getShipId() {
         return shipId;
     }
 
     public void setShipId(int shipId) {
         this.shipId = shipId;
-    }
-
-    public int getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
-    }
-
-    public int getPlayerId() {
-        return playerId;
-    }
-
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
     }
 
     public String getType() {

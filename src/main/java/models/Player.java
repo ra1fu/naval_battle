@@ -25,6 +25,9 @@ public class Player {
         setLosses(losses);
     }
 
+    public Player(int playerId, String name, int rating) {
+    }
+
     public int getPlayerId() { return playerId; }
     public String getName() { return name; }
     public int getRating() { return rating; }
