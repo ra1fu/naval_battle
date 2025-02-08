@@ -20,6 +20,49 @@ public class GameRepository implements IGameRepository {
         this.db = db;
     }
 
+    public boolean isGameOver(int gameId) {
+        String sql = "SELECT COUNT(*) FROM ships WHERE game_id = ? AND sunk = FALSE";
+        try (Connection con = db.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setInt(1, gameId);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) == 0; // Game is over if no ships are left
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Error (isGameOver): " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean checkHit(int gameId, int x, int y) {
+        String sql = "SELECT ship_id FROM ships WHERE game_id = ? AND start_x = ? AND start_y = ? AND sunk = FALSE";
+        try (Connection con = db.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setInt(1, gameId);
+            st.setInt(2, x);
+            st.setInt(3, y);
+            ResultSet rs = st.executeQuery();
+            return rs.next(); // If a ship is found, it's a hit
+        } catch (SQLException e) {
+            System.out.println("SQL Error (checkHit): " + e.getMessage());
+        }
+        return false;
+    }
+
+    public void updateShipStatus(int gameId, int x, int y) {
+        String sql = "UPDATE ships SET sunk = TRUE WHERE game_id = ? AND start_x = ? AND start_y = ?";
+        try (Connection con = db.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setInt(1, gameId);
+            st.setInt(2, x);
+            st.setInt(3, y);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("SQL Error (updateShipStatus): " + e.getMessage());
+        }
+    }
+
     @Override
     public boolean createGame(Game game) {
         String sql = "INSERT INTO games(player1_id, player2_id, current_turn, status, winner_id) VALUES (?, ?, ?, ?, ?)";
