@@ -60,6 +60,7 @@ public class GameRepository implements IGameRepository {
         return false;
     }
 
+    @Override
     public void updateShipStatus(int gameId, int x, int y) {
         if (!GameValidator.isValidGameId(gameId) || !GameValidator.isValidMove(x, y)) return;
 
