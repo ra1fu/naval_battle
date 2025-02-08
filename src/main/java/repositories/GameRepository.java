@@ -20,14 +20,21 @@ public class GameRepository implements IGameRepository {
         this.db = db;
     }
 
+    @Override
     public boolean isGameOver(int gameId) {
         String sql = "SELECT COUNT(*) FROM ships WHERE game_id = ? AND sunk = FALSE";
+
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
+
             st.setInt(1, gameId);
             ResultSet rs = st.executeQuery();
+
             if (rs.next()) {
-                return rs.getInt(1) == 0; // Game is over if no ships are left
+                int remainingShips = rs.getInt(1);
+                System.out.println("Checking isGameOver(): gameId=" + gameId + ", remaining ships=" + remainingShips);
+
+                return remainingShips == 0;  // If no ships are left, the game is over
             }
         } catch (SQLException e) {
             System.out.println("SQL Error (isGameOver): " + e.getMessage());
@@ -35,6 +42,7 @@ public class GameRepository implements IGameRepository {
         return false;
     }
 
+    @Override
     public boolean checkHit(int gameId, int x, int y) {
         String sql = "SELECT ship_id FROM ships WHERE game_id = ? AND start_x = ? AND start_y = ? AND sunk = FALSE";
         try (Connection con = db.getConnection();
@@ -65,7 +73,8 @@ public class GameRepository implements IGameRepository {
 
     @Override
     public boolean createGame(Game game) {
-        String sql = "INSERT INTO games(player1_id, player2_id, current_turn, status, winner_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO games (player1_id, player2_id, current_turn, status, winner_id) " +
+                "VALUES (?, ?, ?, ?::game_status, ?) RETURNING game_id";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -85,19 +94,25 @@ public class GameRepository implements IGameRepository {
                 st.setNull(5, Types.INTEGER);
             }
 
+            System.out.println("Executing SQL: " + st.toString());
+
             int affectedRows = st.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Game creation failed, no rows affected.");
+                System.out.println("Error: Game was not added to the database.");
+                return false;
             }
 
             try (ResultSet generatedKeys = st.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    game.setGameId(generatedKeys.getInt(1));
+                    int newGameId = generatedKeys.getInt(1);
+                    System.out.println("Game ID retrieved from database: " + newGameId);
+                    game.setGameId(newGameId);
+                    return true;
                 } else {
-                    throw new SQLException("Game creation failed, ID not obtained.");
+                    System.out.println("Error: Game ID was not retrieved.");
+                    return false;
                 }
             }
-            return true;
         } catch (SQLException e) {
             System.out.println("SQL Error (createGame): " + e.getMessage());
             return false;
@@ -156,33 +171,38 @@ public class GameRepository implements IGameRepository {
 
     @Override
     public boolean updateGame(Game game) {
-        String sql = "UPDATE games SET player1_id = ?, player2_id = ?, current_turn = ?, status = ?, winner_id = ? WHERE game_id = ?";
+        String sql = "UPDATE games SET current_turn = ?, status = ?, winner_id = ? WHERE game_id = ?";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
 
-            st.setInt(1, game.getPlayer1Id());
-            st.setInt(2, game.getPlayer2Id());
-            st.setInt(3, game.getCurrentTurn());
+            st.setInt(1, game.getCurrentTurn());
 
             PGobject statusObj = new PGobject();
             statusObj.setType("game_status");
             statusObj.setValue(game.getStatus());
-            st.setObject(4, statusObj);
+            st.setObject(2, statusObj);
 
             if (game.getWinnerId() != null) {
-                st.setInt(5, game.getWinnerId());
+                st.setInt(3, game.getWinnerId());
             } else {
-                st.setNull(5, Types.INTEGER);
+                st.setNull(3, Types.INTEGER);
             }
 
-            st.setInt(6, game.getGameId());
-            return st.executeUpdate() > 0;
+            st.setInt(4, game.getGameId());
+
+            System.out.println("Executing updateGame(): gameId=" + game.getGameId() + ", status=" + game.getStatus() + ", winnerId=" + game.getWinnerId());
+
+            int affectedRows = st.executeUpdate();
+            return affectedRows > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (updateGame): " + e.getMessage());
             return false;
         }
     }
+
+
+
 
     @Override
     public boolean deleteGame(int id) {

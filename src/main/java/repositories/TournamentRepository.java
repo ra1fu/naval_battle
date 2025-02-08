@@ -97,24 +97,31 @@ public class TournamentRepository implements ITournamentRepository {
 
     @Override
     public List<Tournament> getAllTournaments() {
-        String sql = "SELECT * FROM tournaments";
+        String sql = "SELECT tournament_id, name, start_date, end_date FROM tournaments";
         List<Tournament> tournaments = new ArrayList<>();
+
         try (Connection con = db.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
+
             while (rs.next()) {
-                tournaments.add(new Tournament(
-                        rs.getInt("tournament_id"),
-                        rs.getString("name"),
-                        rs.getTimestamp("start_date").toLocalDateTime(),
-                        rs.getTimestamp("end_date").toLocalDateTime()
-                ));
+                int tournamentId = rs.getInt("tournament_id");
+                String name = rs.getString("name");
+
+                Timestamp startTimestamp = rs.getTimestamp("start_date");
+                Timestamp endTimestamp = rs.getTimestamp("end_date");
+
+                LocalDateTime startDate = (startTimestamp != null) ? startTimestamp.toLocalDateTime() : null;
+                LocalDateTime endDate = (endTimestamp != null) ? endTimestamp.toLocalDateTime() : null;
+
+                tournaments.add(new Tournament(tournamentId, name, startDate, endDate));
             }
         } catch (SQLException e) {
-            System.out.println("PostgreSQL Error (getAllTournaments): " + e.getMessage());
+            System.out.println("SQL Error (getAllTournaments): " + e.getMessage());
         }
         return tournaments;
     }
+
 
     @Override
     public List<Player> getPlayersByTournament(int tournamentId) {
