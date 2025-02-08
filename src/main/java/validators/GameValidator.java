@@ -8,15 +8,6 @@ import java.util.List;
 
 public class GameValidator {
 
-    public static boolean isValid(Game game) {
-        return game != null &&
-                game.getPlayer1Id() > 0 &&
-                game.getPlayer2Id() > 0 &&
-                game.getPlayer1Id() != game.getPlayer2Id() &&
-                game.getCurrentTurn() > 0 &&
-                (game.getStatus().equals("IN_PROGRESS") || game.getStatus().equals("FINISHED"));
-    }
-
     public static boolean isValidGameId(int gameId) {
         return gameId > 0;
     }
@@ -26,13 +17,29 @@ public class GameValidator {
     }
 
     public static boolean isValidGame(Game game) {
-        return game != null &&
-                isValidGameId(game.getGameId()) &&
-                game.getPlayer1Id() > 0 &&
-                game.getPlayer2Id() > 0 &&
-                game.getCurrentTurn() > 0 &&
-                game.getStatus() != null && !game.getStatus().trim().isEmpty();
+        if (game == null) {
+            System.out.println("Error: the game object is null.");
+            return false;
+        }
+        if (game.getPlayer1Id() <= 0 || game.getPlayer2Id() <= 0) {
+            System.out.println("Error: incorrect player IDs. player1=" + game.getPlayer1Id() + ", player2=" + game.getPlayer2Id());
+            return false;
+        }
+        if (game.getPlayer1Id() == game.getPlayer2Id()) {
+            System.out.println("Error: the players must be different.");
+            return false;
+        }
+        if (game.getCurrentTurn() <= 0) {
+            System.out.println("Error: incorrect ID of the current move.");
+            return false;
+        }
+        if (game.getStatus() == null || game.getStatus().trim().isEmpty()) {
+            System.out.println("Error: The game status is not set.");
+            return false;
+        }
+        return true;
     }
+
 
     public static boolean validateMove(Move move) {
         return move != null &&

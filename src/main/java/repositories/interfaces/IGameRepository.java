@@ -11,6 +11,8 @@ public interface IGameRepository {
 
     boolean checkHit(int gameId, int x, int y);
 
+    Game getGameById(int gameId);
+
     void updateShipStatus(int gameId, int x, int y);
 
     boolean createGame(Game game);

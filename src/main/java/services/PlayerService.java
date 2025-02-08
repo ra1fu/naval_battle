@@ -37,6 +37,20 @@ public class PlayerService {
         return player;
     }
 
+    public Player getPlayerByName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new InvalidDataException("Player name cannot be empty.");
+        }
+
+        Player player = playerRepository.getPlayerByName(name);
+        if (player == null) {
+            throw new PlayerNotFoundException("Player with name '" + name + "' not found.");
+        }
+
+        return player;
+    }
+
+
     public Player getPlayerById(int playerId) {
         if (!PlayerValidator.isValidPlayerId(playerId)) {
             throw new InvalidDataException("Invalid player ID: " + playerId);

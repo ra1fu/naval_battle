@@ -57,6 +57,32 @@ public class GameRepository implements IGameRepository {
     }
 
     @Override
+    public Game getGameById(int gameId) {
+        String sql = "SELECT game_id, player1_id, player2_id, current_turn, status, winner_id FROM games WHERE game_id = ?";
+
+        try (Connection con = db.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+
+            st.setInt(1, gameId);
+            ResultSet rs = st.executeQuery();
+
+            if (rs.next()) {
+                return new Game(
+                        rs.getInt("game_id"),
+                        rs.getInt("player1_id"),
+                        rs.getInt("player2_id"),
+                        rs.getInt("current_turn"),
+                        rs.getString("status"),
+                        rs.getObject("winner_id") != null ? rs.getInt("winner_id") : null
+                );
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Error (getGameById): " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
     public void updateShipStatus(int gameId, int x, int y) {
         if (!GameValidator.isValidGameId(gameId) || !GameValidator.isValidMove(x, y)) return;
 

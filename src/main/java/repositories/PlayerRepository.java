@@ -56,10 +56,11 @@ public class PlayerRepository implements IPlayerRepository {
 
     @Override
     public Player getPlayerByName(String name) {
-        String sql = "SELECT * FROM players WHERE name = ? LIMIT 1";
+        String sql = "SELECT player_id, name, rating, games_played, wins, losses FROM players WHERE name = ?";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
+
             st.setString(1, name);
             ResultSet rs = st.executeQuery();
 
@@ -78,6 +79,7 @@ public class PlayerRepository implements IPlayerRepository {
         }
         return null;
     }
+
 
     @Override
     public Player getPlayer(int playerId) {
