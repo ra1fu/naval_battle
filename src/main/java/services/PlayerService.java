@@ -23,6 +23,20 @@ public class PlayerService {
         return playerRepository.createPlayer(player);
     }
 
+    public Player getOrCreatePlayer(String name) {
+        Player player = playerRepository.getPlayerByName(name);
+        if (player != null) {
+            return player;
+        }
+
+        player = new Player(0, name, 1000, 0, 0, 0);
+        boolean created = playerRepository.createPlayer(player);
+        if (!created) {
+            throw new RuntimeException("An error occurred when creating a player.");
+        }
+        return player;
+    }
+
     public Player getPlayerById(int playerId) {
         if (!PlayerValidator.isValidPlayerId(playerId)) {
             throw new InvalidDataException("Invalid player ID: " + playerId);

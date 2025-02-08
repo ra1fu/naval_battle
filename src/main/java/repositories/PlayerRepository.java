@@ -55,6 +55,31 @@ public class PlayerRepository implements IPlayerRepository {
     }
 
     @Override
+    public Player getPlayerByName(String name) {
+        String sql = "SELECT * FROM players WHERE name = ? LIMIT 1";
+
+        try (Connection con = db.getConnection();
+             PreparedStatement st = con.prepareStatement(sql)) {
+            st.setString(1, name);
+            ResultSet rs = st.executeQuery();
+
+            if (rs.next()) {
+                return new Player(
+                        rs.getInt("player_id"),
+                        rs.getString("name"),
+                        rs.getInt("rating"),
+                        rs.getInt("games_played"),
+                        rs.getInt("wins"),
+                        rs.getInt("losses")
+                );
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Error (getPlayerByName): " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
     public Player getPlayer(int playerId) {
         String sql = "SELECT * FROM players WHERE player_id = ?";
         try (Connection con = db.getConnection();

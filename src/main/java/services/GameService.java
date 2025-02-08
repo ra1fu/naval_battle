@@ -91,14 +91,14 @@ public class GameService {
 
     public boolean placeShip(int gameId, int playerId, int x, int y, int size, String orientation) {
         if (!GameValidator.isValidGameId(gameId) || playerId <= 0 || size <= 0) {
-            System.out.println("Ошибка: Неверные параметры корабля.");
+            System.out.println("Error: Incorrect ship parameters.");
             return false;
         }
 
         List<Ship> existingShips = shipRepository.getShipsByGameAndPlayer(gameId, playerId);
 
         if (!GameValidator.isPlacementValid(x, y, size, orientation, existingShips)) {
-            System.out.println("Ошибка: Корабль нельзя разместить в указанном месте.");
+            System.out.println("Error: The ship cannot be placed in the specified location.");
             return false;
         }
 
@@ -107,11 +107,11 @@ public class GameService {
         boolean success = shipRepository.createShip(ship);
 
         if (!success) {
-            System.out.println("Ошибка: Корабль не удалось создать в базе данных.");
+            System.out.println("Error: The ship could not be created in the database.");
             return false;
         }
 
-        System.out.println("Корабль успешно создан: " + ship);
+        System.out.println("The ship has been successfully created:" + ship);
         displayGameBoard(gameId, playerId);
         return true;
     }
@@ -123,7 +123,7 @@ public class GameService {
         }
 
         if (!game.isPlayerTurn(playerId)) {
-            throw new InvalidDataException("Сейчас не ход игрока " + playerId + ".");
+            throw new InvalidDataException("It's not the player's turn right now " + playerId + ".");
         }
 
         boolean hit = gameRepository.checkHit(gameId, x, y);
@@ -134,12 +134,12 @@ public class GameService {
         Move move = new Move(0, gameId, playerId, x, y, hit ? "HIT" : "MISS", LocalDateTime.now());
 
         if (!GameValidator.validateMove(move)) {
-            throw new InvalidDataException("Недопустимые данные хода.");
+            throw new InvalidDataException("Invalid move data.");
         }
 
         boolean moveCreated = moveRepository.createMove(move);
         if (!moveCreated) {
-            throw new RuntimeException("Ошибка при создании хода.");
+            throw new RuntimeException("Error when creating a move.");
         }
 
         if (gameRepository.isGameOver(gameId)) {
