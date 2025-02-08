@@ -18,23 +18,23 @@ public class GameValidator {
 
     public static boolean isValidGame(Game game) {
         if (game == null) {
-            System.out.println("Ошибка: объект игры равен null.");
+            System.out.println("Error: the game object is null.");
             return false;
         }
         if (game.getPlayer1Id() <= 0 || game.getPlayer2Id() <= 0) {
-            System.out.println("Ошибка: некорректные ID игроков. player1=" + game.getPlayer1Id() + ", player2=" + game.getPlayer2Id());
+            System.out.println("Error: incorrect player IDs. player1=" + game.getPlayer1Id() + ", player2=" + game.getPlayer2Id());
             return false;
         }
         if (game.getPlayer1Id() == game.getPlayer2Id()) {
-            System.out.println("Ошибка: игроки должны быть разными.");
+            System.out.println("Error: the players must be different.");
             return false;
         }
         if (game.getCurrentTurn() <= 0) {
-            System.out.println("Ошибка: некорректный ID текущего хода.");
+            System.out.println("Error: incorrect ID of the current move.");
             return false;
         }
         if (game.getStatus() == null || game.getStatus().trim().isEmpty()) {
-            System.out.println("Ошибка: статус игры не установлен.");
+            System.out.println("Error: The game status is not set.");
             return false;
         }
         return true;
