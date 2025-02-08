@@ -10,10 +10,9 @@ public class EntityFactory {
         return new Player(playerId, name, rating, gamesPlayed, wins, losses);
     }
 
-    public static Ship createShip(int shipId, int gameId, int playerId,
-                                  String shipType, int size, int startX, int startY,
+    public static Ship createShip(int shipId, int gameId, int playerId, int size, int startX, int startY,
                                   String orientation, boolean sunk) {
-        return new Ship(shipId, gameId, playerId, shipType, size, startX, startY, orientation, sunk);
+        return new Ship(shipId, gameId, playerId,size, startX, startY, orientation, sunk);
     }
 
     public static Move createMove(int moveId, int gameId, int playerId, int x, int y, String result, LocalDateTime moveTime) {

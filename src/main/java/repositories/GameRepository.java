@@ -185,7 +185,7 @@ public class GameRepository implements IGameRepository {
     public GameDetails getFullGameDetails(int gameId) {
         String sql = "SELECT g.game_id, g.status, g.winner_id, " +
                 "p1.name AS player1_name, p2.name AS player2_name, " +
-                "s.ship_id, s.player_id AS ship_player_id, s.x AS ship_x, s.y AS ship_y, s.type AS ship_type, s.size, s.orientation, s.sunk, " +
+                "s.ship_id, s.player_id AS ship_player_id, s.x AS ship_x, s.y AS ship_y, s.size, s.orientation, s.sunk, " +
                 "m.move_id, m.player_id AS move_player_id, m.x AS move_x, m.y AS move_y, m.result, m.move_time " +
                 "FROM games g " +
                 "JOIN players p1 ON g.player1_id = p1.player_id " +
@@ -219,7 +219,6 @@ public class GameRepository implements IGameRepository {
                         rs.getInt("ship_id"),
                         rs.getInt("game_id"),
                         rs.getInt("ship_player_id"),
-                        rs.getString("ship_type"),
                         rs.getInt("size"),
                         rs.getInt("ship_x"),
                         rs.getInt("ship_y"),
