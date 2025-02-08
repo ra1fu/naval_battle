@@ -90,6 +90,10 @@ public class Game {
         }
     }
 
+    public boolean isPlayerTurn(int playerId) {
+        return currentTurn == playerId;
+    }
+
     @Override
     public String toString() {
         return "Game{" +
