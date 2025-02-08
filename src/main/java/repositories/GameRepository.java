@@ -1,10 +1,7 @@
 package repositories;
 
 import data.interfaces.IDB;
-import models.Game;
-import models.GameDetails;
-import models.Move;
-import models.Ship;
+import models.*;
 import repositories.interfaces.IGameRepository;
 import factories.EntityFactory;
 import validators.GameValidator;
@@ -12,6 +9,7 @@ import validators.GameValidator;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.postgresql.util.PGobject;
 
 public class GameRepository implements IGameRepository {
@@ -28,13 +26,11 @@ public class GameRepository implements IGameRepository {
         String sql = "SELECT COUNT(*) FROM ships WHERE game_id = ? AND sunk = FALSE";
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
-
             st.setInt(1, gameId);
             ResultSet rs = st.executeQuery();
 
             if (rs.next()) {
-                int remainingShips = rs.getInt(1);
-                return remainingShips == 0;
+                return rs.getInt(1) == 0;
             }
         } catch (SQLException e) {
             System.out.println("SQL Error (isGameOver): " + e.getMessage());
@@ -46,7 +42,7 @@ public class GameRepository implements IGameRepository {
     public boolean checkHit(int gameId, int x, int y) {
         if (!GameValidator.isValidGameId(gameId) || !GameValidator.isValidMove(x, y)) return false;
 
-        String sql = "SELECT ship_id FROM ships WHERE game_id = ? AND start_x = ? AND start_y = ? AND sunk = FALSE";
+        String sql = "SELECT ship_id FROM ships WHERE game_id = ? AND x = ? AND y = ? AND sunk = FALSE";
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
             st.setInt(1, gameId);
@@ -64,7 +60,7 @@ public class GameRepository implements IGameRepository {
     public void updateShipStatus(int gameId, int x, int y) {
         if (!GameValidator.isValidGameId(gameId) || !GameValidator.isValidMove(x, y)) return;
 
-        String sql = "UPDATE ships SET sunk = TRUE WHERE game_id = ? AND start_x = ? AND start_y = ?";
+        String sql = "UPDATE ships SET sunk = TRUE WHERE game_id = ? AND x = ? AND y = ?";
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
             st.setInt(1, gameId);
@@ -85,7 +81,6 @@ public class GameRepository implements IGameRepository {
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
             st.setInt(1, game.getPlayer1Id());
             st.setInt(2, game.getPlayer2Id());
             st.setInt(3, game.getCurrentTurn());
@@ -121,7 +116,6 @@ public class GameRepository implements IGameRepository {
         if (!GameValidator.isValidGameId(id)) return null;
 
         String sql = "SELECT game_id, player1_id, player2_id, current_turn, status, winner_id FROM games WHERE game_id = ?";
-
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
             st.setInt(1, id);
@@ -144,36 +138,10 @@ public class GameRepository implements IGameRepository {
     }
 
     @Override
-    public List<Game> getAllGames() {
-        String sql = "SELECT game_id, player1_id, player2_id, current_turn, status, winner_id FROM games";
-        List<Game> games = new ArrayList<>();
-
-        try (Connection con = db.getConnection();
-             Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-
-            while (rs.next()) {
-                games.add(EntityFactory.createGame(
-                        rs.getInt("game_id"),
-                        rs.getInt("player1_id"),
-                        rs.getInt("player2_id"),
-                        rs.getInt("current_turn"),
-                        rs.getString("status"),
-                        rs.getObject("winner_id") != null ? rs.getInt("winner_id") : null
-                ));
-            }
-        } catch (SQLException e) {
-            System.out.println("SQL Error (getAllGames): " + e.getMessage());
-        }
-        return games;
-    }
-
-    @Override
     public boolean updateGame(Game game) {
         if (!GameValidator.isValidGame(game)) return false;
 
         String sql = "UPDATE games SET current_turn = ?, status = ?, winner_id = ? WHERE game_id = ?";
-
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
             st.setInt(1, game.getCurrentTurn());
@@ -191,16 +159,12 @@ public class GameRepository implements IGameRepository {
 
             st.setInt(4, game.getGameId());
 
-            int affectedRows = st.executeUpdate();
-            return affectedRows > 0;
+            return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("SQL Error (updateGame): " + e.getMessage());
             return false;
         }
     }
-
-
-
 
     @Override
     public boolean deleteGame(int id) {
@@ -281,5 +245,4 @@ public class GameRepository implements IGameRepository {
             return null;
         }
     }
-
 }
