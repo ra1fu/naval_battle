@@ -4,6 +4,7 @@ import data.interfaces.IDB;
 import models.Player;
 import models.Tournament;
 import repositories.interfaces.ITournamentRepository;
+import validators.TournamentValidator;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -19,6 +20,11 @@ public class TournamentRepository implements ITournamentRepository {
 
     @Override
     public boolean createTournament(Tournament tournament) {
+        if (!TournamentValidator.isValidTournament(tournament)) {
+            System.out.println("Validation Error: Invalid tournament data.");
+            return false;
+        }
+
         String sql = "INSERT INTO tournaments(name, start_date, end_date, status) VALUES (?, ?, ?, 'PLANNED') RETURNING tournament_id";
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -37,6 +43,11 @@ public class TournamentRepository implements ITournamentRepository {
 
     @Override
     public boolean addPlayerToTournament(int tournamentId, int playerId) {
+        if (!TournamentValidator.isValidTournamentId(tournamentId) || playerId <= 0) {
+            System.out.println("Validation Error: Invalid tournament ID or player ID.");
+            return false;
+        }
+
         String checkTournamentSql = "SELECT COUNT(*) FROM tournaments WHERE tournament_id = ?";
         String checkPlayerSql = "SELECT COUNT(*) FROM tournament_players WHERE tournament_id = ? AND player_id = ?";
         String insertSql = "INSERT INTO tournament_players(tournament_id, player_id) VALUES (?, ?)";
@@ -46,7 +57,7 @@ public class TournamentRepository implements ITournamentRepository {
                 checkTournamentSt.setInt(1, tournamentId);
                 ResultSet rsTournament = checkTournamentSt.executeQuery();
                 if (rsTournament.next() && rsTournament.getInt(1) == 0) {
-                    System.out.println("Ошибка: Турнир с ID " + tournamentId + " не существует.");
+                    System.out.println("Error: Tournament ID " + tournamentId + " does not exist.");
                     return false;
                 }
             }
@@ -56,7 +67,7 @@ public class TournamentRepository implements ITournamentRepository {
                 checkPlayerSt.setInt(2, playerId);
                 ResultSet rsPlayer = checkPlayerSt.executeQuery();
                 if (rsPlayer.next() && rsPlayer.getInt(1) > 0) {
-                    System.out.println("Игрок уже участвует в турнире.");
+                    System.out.println("Error: Player is already in the tournament.");
                     return false;
                 }
             }
@@ -76,6 +87,11 @@ public class TournamentRepository implements ITournamentRepository {
 
     @Override
     public Tournament getTournament(int tournamentId) {
+        if (!TournamentValidator.isValidTournamentId(tournamentId)) {
+            System.out.println("Validation Error: Invalid tournament ID.");
+            return null;
+        }
+
         String sql = "SELECT * FROM tournaments WHERE tournament_id = ?";
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -148,6 +164,11 @@ public class TournamentRepository implements ITournamentRepository {
 
     @Override
     public boolean updateTournamentStatus(int tournamentId, String status) {
+        if (!TournamentValidator.isValidTournamentId(tournamentId) || !TournamentValidator.isValidStatus(status)) {
+            System.out.println("Validation Error: Invalid tournament ID or status.");
+            return false;
+        }
+
         String sql = "UPDATE tournaments SET status = ?::tournament_status WHERE tournament_id = ?";
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -165,6 +186,11 @@ public class TournamentRepository implements ITournamentRepository {
 
     @Override
     public boolean deleteTournament(int tournamentId) {
+        if (!TournamentValidator.isValidTournamentId(tournamentId)) {
+            System.out.println("Validation Error: Invalid tournament ID.");
+            return false;
+        }
+
         String deletePlayersSql = "DELETE FROM tournament_players WHERE tournament_id = ?";
         String deleteTournamentSql = "DELETE FROM tournaments WHERE tournament_id = ?";
 
