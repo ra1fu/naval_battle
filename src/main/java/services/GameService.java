@@ -1,5 +1,7 @@
 package services;
 
+import exceptions.GameNotFoundException;
+import exceptions.InvalidDataException;
 import models.Game;
 import models.Move;
 import models.Player;
@@ -21,27 +23,32 @@ public class GameService {
     }
 
     public Game startGame(int player1Id, int player2Id) {
-        boolean player1Exists = gameRepository.getGame(player1Id) != null;
-        boolean player2Exists = gameRepository.getGame(player2Id) != null;
-
-        if (!GameValidator.validatePlayers(player1Exists, player2Exists)) {
-            return null;
+        if (player1Id <= 0 || player2Id <= 0) {
+            throw new InvalidDataException("Invalid player IDs provided.");
         }
 
         Game game = new Game(0, player1Id, player2Id, player1Id, "IN_PROGRESS", null);
 
         if (!GameValidator.isValidGame(game)) {
-            return null;
+            throw new InvalidDataException("Invalid game data.");
         }
 
         boolean success = gameRepository.createGame(game);
-        return success ? game : null;
+        if (!success) {
+            throw new RuntimeException("Failed to create game.");
+        }
+
+        return game;
     }
 
     public boolean makeMove(int gameId, int playerId, int x, int y) {
         Game game = gameRepository.getGame(gameId);
-        if (game == null || !game.isPlayerTurn(playerId)) {
-            return false;
+        if (game == null) {
+            throw new GameNotFoundException("Game with ID " + gameId + " not found.");
+        }
+
+        if (!game.isPlayerTurn(playerId)) {
+            throw new InvalidDataException("It's not player " + playerId + "'s turn.");
         }
 
         boolean hit = gameRepository.checkHit(gameId, x, y);
@@ -52,12 +59,12 @@ public class GameService {
         Move move = new Move(0, gameId, playerId, x, y, hit ? "HIT" : "MISS", LocalDateTime.now());
 
         if (!GameValidator.validateMove(move)) {
-            return false;
+            throw new InvalidDataException("Invalid move data.");
         }
 
         boolean moveCreated = moveRepository.createMove(move);
         if (!moveCreated) {
-            return false;
+            throw new RuntimeException("Failed to create move.");
         }
 
         if (gameRepository.isGameOver(gameId)) {
