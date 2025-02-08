@@ -1,6 +1,7 @@
 package repositories;
 
 import data.interfaces.IDB;
+import exceptions.PlayerNotFoundException;
 import models.Player;
 import repositories.interfaces.IPlayerRepository;
 import factories.EntityFactory;
@@ -54,17 +55,16 @@ public class PlayerRepository implements IPlayerRepository {
     }
 
     @Override
-    public Player getPlayer(int id) {
-        String sql = "SELECT player_id, name, rating, games_played, wins, losses FROM players WHERE player_id = ?";
-
+    public Player getPlayer(int playerId) {
+        String sql = "SELECT * FROM players WHERE player_id = ?";
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
 
-            st.setInt(1, id);
+            st.setInt(1, playerId);
             ResultSet rs = st.executeQuery();
 
             if (rs.next()) {
-                return EntityFactory.createPlayer(
+                return new Player(
                         rs.getInt("player_id"),
                         rs.getString("name"),
                         rs.getInt("rating"),
@@ -72,11 +72,12 @@ public class PlayerRepository implements IPlayerRepository {
                         rs.getInt("wins"),
                         rs.getInt("losses")
                 );
+            } else {
+                throw new PlayerNotFoundException("Player with ID " + playerId + " not found.");
             }
         } catch (SQLException e) {
-            System.out.println("SQL Error (getPlayer): " + e.getMessage());
+            throw new RuntimeException("SQL Error (getPlayer): " + e.getMessage());
         }
-        return null;
     }
 
     @Override
