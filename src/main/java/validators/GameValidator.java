@@ -1,58 +1,46 @@
 package validators;
 
 import models.Game;
+import models.Move;
 
 public class GameValidator {
 
-    public static boolean isValidGame(Game game) {
-        if (game == null) return false;
-        return isValidGameId(game.getGameId()) &&
-                isValidPlayerId(game.getPlayer1Id()) &&
-                isValidPlayerId(game.getPlayer2Id()) &&
-                game.getStatus() != null && !game.getStatus().isEmpty();
+    public static boolean isValid(Game game) {
+        return game != null &&
+                game.getPlayer1Id() > 0 &&
+                game.getPlayer2Id() > 0 &&
+                game.getPlayer1Id() != game.getPlayer2Id() &&
+                game.getCurrentTurn() > 0 &&
+                (game.getStatus().equals("IN_PROGRESS") || game.getStatus().equals("FINISHED"));
     }
 
     public static boolean isValidGameId(int gameId) {
         return gameId > 0;
     }
 
-    public static boolean isValidPlayerId(int playerId) {
-        return playerId > 0;
-    }
-
     public static boolean isValidMove(int x, int y) {
-        return x >= 0 && x < 10 && y >= 0 && y < 10;
+        return x >= 0 && y >= 0;
     }
 
-    public static boolean validatePlayers(int player1Id, int player2Id) {
-        if (player1Id <= 0 || player2Id <= 0) {
-            System.out.println("Validation Error: Player IDs must be greater than zero.");
-            return false;
-        }
-        if (player1Id == player2Id) {
-            System.out.println("Validation Error: Players must have different IDs.");
-            return false;
-        }
-        return true;
+    public static boolean isValidGame(Game game) {
+        return game != null &&
+                isValidGameId(game.getGameId()) &&
+                game.getPlayer1Id() > 0 &&
+                game.getPlayer2Id() > 0 &&
+                game.getCurrentTurn() > 0 &&
+                game.getStatus() != null && !game.getStatus().trim().isEmpty();
     }
 
-    public static boolean validateMove(Game game, int playerId, int x, int y) {
-        if (game == null) {
-            System.out.println("Validation Error: Game does not exist.");
-            return false;
-        }
-        if (game.getStatus().equals("FINISHED")) {
-            System.out.println("Validation Error: The game is already finished.");
-            return false;
-        }
-        if (!game.isPlayerTurn(playerId)) {
-            System.out.println("Validation Error: It is not this player's turn.");
-            return false;
-        }
-        if (x < 0 || y < 0) {
-            System.out.println("Validation Error: Coordinates must be non-negative.");
-            return false;
-        }
-        return true;
+    public static boolean validateMove(Move move) {
+        return move != null &&
+                move.getGameId() > 0 &&
+                move.getPlayerId() > 0 &&
+                move.getX() >= 0 && move.getY() >= 0 &&
+                (move.getResult().equals("HIT") || move.getResult().equals("MISS")) &&
+                move.getMoveTime() != null;
+    }
+
+    public static boolean validatePlayers(boolean player1Exists, boolean player2Exists) {
+        return player1Exists && player2Exists;
     }
 }

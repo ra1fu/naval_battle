@@ -1,5 +1,6 @@
 package validators;
 
+import models.Game;
 import models.Player;
 
 public class PlayerValidator {
@@ -14,7 +15,9 @@ public class PlayerValidator {
                 player.getWins() <= player.getGamesPlayed() &&
                 player.getLosses() <= player.getGamesPlayed();
     }
-
+    public static boolean isValidPlayerId(int playerId) {
+        return playerId > 0;
+    }
     public static void validatePlayer(Player player) throws IllegalArgumentException {
         if (player == null) {
             throw new IllegalArgumentException("Player cannot be null.");
