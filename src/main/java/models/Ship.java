@@ -11,11 +11,10 @@ public class Ship {
     private boolean sunk;
     private int hits;
 
-    public Ship(int shipId, int gameId, int playerId, String type, int size, int startX, int startY, String orientation, boolean sunk) {
+    public Ship(int shipId, int gameId, int playerId, int size, int startX, int startY, String orientation, boolean sunk) {
         this.shipId = shipId;
         this.gameId = gameId;
         this.playerId = playerId;
-        this.type = type;
         this.size = size;
         this.startX = startX;
         this.startY = startY;

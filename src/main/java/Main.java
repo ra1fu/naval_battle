@@ -13,8 +13,6 @@ public class Main {
 
         PostgresDB db = PostgresDB.getInstance("34.118.52.174", "rauan", "0000", "naval");
 
-
-
         db.close();
     }
 }

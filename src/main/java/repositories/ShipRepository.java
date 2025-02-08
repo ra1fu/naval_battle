@@ -18,19 +18,18 @@ public class ShipRepository implements IShipRepository {
 
     @Override
     public boolean createShip(Ship ship) {
-        String sql = "INSERT INTO ships(game_id, player_id, type, size, start_x, start_y, orientation, sunk) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ships(game_id, player_id, size, start_x, start_y, orientation, sunk) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             st.setInt(1, ship.getGameId());
             st.setInt(2, ship.getPlayerId());
-            st.setString(3, ship.getType());
-            st.setInt(4, ship.getSize());
-            st.setInt(5, ship.getStartX());
-            st.setInt(6, ship.getStartY());
-            st.setString(7, ship.getOrientation());
-            st.setBoolean(8, ship.isSunk());
+            st.setInt(3, ship.getSize());
+            st.setInt(4, ship.getStartX());
+            st.setInt(5, ship.getStartY());
+            st.setString(6, ship.getOrientation());
+            st.setBoolean(7, ship.isSunk());
 
             int affectedRows = st.executeUpdate();
             if (affectedRows == 0) {
@@ -53,7 +52,7 @@ public class ShipRepository implements IShipRepository {
 
     @Override
     public Ship getShip(int id) {
-        String sql = "SELECT ship_id, game_id, player_id, type, size, start_x, start_y, orientation, sunk FROM ships WHERE ship_id = ?";
+        String sql = "SELECT ship_id, game_id, player_id, size, start_x, start_y, orientation, sunk FROM ships WHERE ship_id = ?";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
@@ -66,7 +65,6 @@ public class ShipRepository implements IShipRepository {
                         rs.getInt("ship_id"),
                         rs.getInt("game_id"),
                         rs.getInt("player_id"),
-                        rs.getString("type"),
                         rs.getInt("size"),
                         rs.getInt("start_x"),
                         rs.getInt("start_y"),
@@ -82,7 +80,7 @@ public class ShipRepository implements IShipRepository {
 
     @Override
     public List<Ship> getShipsByGameAndPlayer(int gameId, int playerId) {
-        String sql = "SELECT ship_id, game_id, player_id, type, size, start_x, start_y, orientation, sunk FROM ships WHERE game_id = ? AND player_id = ?";
+        String sql = "SELECT ship_id, game_id, player_id, size, start_x, start_y, orientation, sunk FROM ships WHERE game_id = ? AND player_id = ?";
         List<Ship> ships = new ArrayList<>();
 
         try (Connection con = db.getConnection();
@@ -97,7 +95,6 @@ public class ShipRepository implements IShipRepository {
                         rs.getInt("ship_id"),
                         rs.getInt("game_id"),
                         rs.getInt("player_id"),
-                        rs.getString("type"),
                         rs.getInt("size"),
                         rs.getInt("start_x"),
                         rs.getInt("start_y"),
@@ -113,20 +110,19 @@ public class ShipRepository implements IShipRepository {
 
     @Override
     public boolean updateShip(Ship ship) {
-        String sql = "UPDATE ships SET game_id = ?, player_id = ?, type = ?, size = ?, start_x = ?, start_y = ?, orientation = ?, sunk = ? WHERE ship_id = ?";
+        String sql = "UPDATE ships SET game_id = ?, player_id = ?, size = ?, start_x = ?, start_y = ?, orientation = ?, sunk = ? WHERE ship_id = ?";
 
         try (Connection con = db.getConnection();
              PreparedStatement st = con.prepareStatement(sql)) {
 
             st.setInt(1, ship.getGameId());
             st.setInt(2, ship.getPlayerId());
-            st.setString(3, ship.getType());
-            st.setInt(4, ship.getSize());
-            st.setInt(5, ship.getStartX());
-            st.setInt(6, ship.getStartY());
-            st.setString(7, ship.getOrientation());
-            st.setBoolean(8, ship.isSunk());
-            st.setInt(9, ship.getShipId());
+            st.setInt(3, ship.getSize());
+            st.setInt(4, ship.getStartX());
+            st.setInt(5, ship.getStartY());
+            st.setString(6, ship.getOrientation());
+            st.setBoolean(7, ship.isSunk());
+            st.setInt(8, ship.getShipId());
 
             return st.executeUpdate() > 0;
         } catch (SQLException e) {
